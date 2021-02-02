@@ -184,10 +184,10 @@ ts3init_send_ipv4_reply(struct sk_buff *oldskb, const struct xt_action_param *pa
     dst_init2(&dste, oldskb->dev);
     skb_dst_set_noref(skb, &dste);
 
-    #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 78)
     if (unlikely(ip_route_me_harder(par_net(par), skb->sk, skb, RTN_UNSPEC) != 0)){
     #else
-    if (unlikely(ip_route_me_harder(par_net(par), skb, RTN_UNSPEC) != 0)){
+    if (ip_route_me_harder(par_net(par), skb, RTN_UNSPEC) != 0){
     #endif
         goto free_nskb;
     }
@@ -227,7 +227,11 @@ ts3init_reset_ipv4_tg(struct sk_buff *skb, const struct xt_action_param *par)
         return NF_DROP;
 
     ts3init_send_ipv4_reply(skb, par, ip, udp, ts3init_reset_packet, sizeof(ts3init_reset_packet));
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
     nf_reset_ct(skb);
+    #else
+    nf_reset(skb);
+    #endif
     consume_skb(skb);
     return NF_STOLEN;
 }
@@ -247,7 +251,11 @@ ts3init_reset_ipv6_tg(struct sk_buff *skb, const struct xt_action_param *par)
         return NF_DROP;
 
     ts3init_send_ipv6_reply(skb, par, ip, udp, ts3init_reset_packet, sizeof(ts3init_reset_packet));
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
     nf_reset_ct(skb);
+    #else
+    nf_reset(skb);
+    #endif
     consume_skb(skb);
     return NF_STOLEN;
 }
@@ -357,7 +365,11 @@ ts3init_set_cookie_ipv4_tg(struct sk_buff *skb, const struct xt_action_param *pa
         ts3init_fill_set_cookie_payload(skb, par, cookie, packet_index, payload))
     {
         ts3init_send_ipv4_reply(skb, par, ip, udp, payload, sizeof(payload));
+        #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
         nf_reset_ct(skb);
+	#else
+        nf_reset(skb);
+	#endif
         consume_skb(skb);
         return NF_STOLEN;
     }
@@ -386,7 +398,11 @@ ts3init_set_cookie_ipv6_tg(struct sk_buff *skb, const struct xt_action_param *pa
         ts3init_fill_set_cookie_payload(skb, par, cookie, packet_index, payload))
     {
         ts3init_send_ipv6_reply(skb, par, ip, udp, payload, sizeof(payload));
+	#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
         nf_reset_ct(skb);
+	#else
+	nf_reset(skb);
+	#endif
         consume_skb(skb);
         return NF_STOLEN;
     }
