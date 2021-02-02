@@ -1,8 +1,6 @@
 #ifndef _TS3INIT_COOKIE_H
 #define _TS3INIT_COOKIE_H
 
-typedef u32 time_t;
-
 enum
 {
     SHA512_SIZE = 64,

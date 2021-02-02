@@ -1,8 +1,6 @@
 #ifndef _TS3INIT_CACHE_H
 #define _TS3INIT_CACHE_H
 
-typedef u32 time_t;
-
 /*
  * Returns the current unix_time from cache, updated once every second.
  */
